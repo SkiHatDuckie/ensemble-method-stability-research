@@ -11,4 +11,5 @@ license = {text = "GPL-3.0-or-later"}
 
 dependencies = [
     "pandas==3.0.2",
+    "scikit-learn==1.8.0",
 ]
