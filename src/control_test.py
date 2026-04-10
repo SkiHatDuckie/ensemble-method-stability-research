@@ -3,5 +3,24 @@
 import pandas as pd
 
 if __name__ == "__main__":
-    data_path = "data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
-    data = pd.read_csv(data_path, delimiter=",")
+    data_path = "data/clean-telco-churn.csv"
+    try:
+        data = pd.read_csv(data_path, delimiter=",")
+    except FileNotFoundError:
+        print(f"ERROR: Cleaned dataset '{data_path}' not found. Did you run module clean_data?")
+
+    """TODO
+    Add Feature Selection Here
+    """
+
+    """TODO
+    Add Training Process
+    """
+
+    """TODO
+    Add Evaluation Process
+    """
+
+    """TODO
+    Save Results to a File
+    """
