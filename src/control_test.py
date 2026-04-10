@@ -1,7 +1,7 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
 import pandas as pd
-from models.base_learner import Base_Learner
+from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
 
 if __name__ == "__main__":
     data_path = "data/clean-telco-churn.csv"
@@ -11,9 +11,13 @@ if __name__ == "__main__":
         print(f"ERROR: Cleaned dataset '{data_path}' not found. Did you run module clean_data?")
 
     """TODO
-    Add Feature Selection Here
+    Add Feature Selection Here (?)
     """
-    model = Base_Learner()
+
+    model = BaseLearner()
+    adaboost = AdaBoost(model)
+    gradient_boosting = GradientBoosting()
+    random_forest = RandomForest()
 
     """TODO
     Add Training Process
