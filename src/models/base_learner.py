@@ -4,4 +4,5 @@ from sklearn import tree
 
 
 class Base_Learner:
-    pass
+    def __init__(self) -> None:
+        self.model = tree.DecisionTreeClassifier()

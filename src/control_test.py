@@ -1,6 +1,7 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
 import pandas as pd
+from models.base_learner import Base_Learner
 
 if __name__ == "__main__":
     data_path = "data/clean-telco-churn.csv"
@@ -12,6 +13,7 @@ if __name__ == "__main__":
     """TODO
     Add Feature Selection Here
     """
+    model = Base_Learner()
 
     """TODO
     Add Training Process
