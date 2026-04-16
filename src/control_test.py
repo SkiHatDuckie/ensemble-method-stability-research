@@ -1,6 +1,8 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
 
 if __name__ == "__main__":
@@ -22,6 +24,11 @@ if __name__ == "__main__":
     """TODO
     Add Training Process
     """
+    train_data, test_data = train_test_split(data, test_size=0.2, random_state=15)
+    train_inputs = train_data.iloc[:, :-1]
+    train_targets = train_data[["Churn"]]
+    test_inputs = test_data.iloc[:, :-1]
+    test_targets = test_data[["Churn"]]
 
     """TODO
     Add Evaluation Process
