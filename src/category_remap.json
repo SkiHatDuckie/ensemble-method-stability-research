@@ -1,0 +1,18 @@
+{
+  "gender": ["Female", "Male"],
+  "Partner": ["No", "Yes"],
+  "Dependents": ["No", "Yes"],
+  "PhoneService": ["No", "Yes"],
+  "MultipleLines": ["No", "Yes", "No phone service"],
+  "InternetService": ["No", "Fiber Optic", "DSL"],
+  "OnlineSecurity": ["No", "Yes", "No internet service"],
+  "OnlineBackup": ["No", "Yes", "No internet service"],
+  "DeviceProtection": ["No", "Yes", "No internet service"],
+  "TechSupport": ["No", "Yes", "No internet service"],
+  "StreamingTV": ["No", "Yes", "No internet service"],
+  "StreamingMovies": ["No", "Yes", "No internet service"],
+  "Contract": ["One year", "Two year", "Month-to-month"],
+  "PaperlessBilling": ["No", "Yes"],
+  "PaymentMethod": ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"],
+  "Churn": ["No", "Yes"]
+}
