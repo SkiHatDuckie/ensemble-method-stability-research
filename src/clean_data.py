@@ -11,6 +11,8 @@ if __name__ == "__main__":
     """TODO
     Do Preprocessing
     """
+    data = data.drop(columns=["customerID"])
+    data[["TotalCharges"]] = data[["TotalCharges"]].replace(" ", 0.0)
 
     # Remap all non-numeric columns to numeric using lookup tables
     with open("src/category_remap.json", "r", encoding="utf-8") as f:

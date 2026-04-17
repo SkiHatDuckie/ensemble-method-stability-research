@@ -1,5 +1,5 @@
 {
-  "gender": {"Female":0, "Male":0},
+  "gender": {"Female":0, "Male":1},
   "Partner": {"No":0, "Yes":1},
   "Dependents": {"No":0, "Yes":1},
   "PhoneService": {"No":0, "Yes":1},
