@@ -13,10 +13,6 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"ERROR: Cleaned dataset '{data_path}' not found. Did you run module clean_data?")
 
-    """TODO
-    Add Feature Selection Here (?)
-    """
-
     learner = BaseLearner()
     adaboost = AdaBoost(learner)
     gradient_boosting = GradientBoosting()
