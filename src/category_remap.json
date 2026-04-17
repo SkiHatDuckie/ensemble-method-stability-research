@@ -1,0 +1,23 @@
+{
+  "gender": {"Female":0, "Male":1},
+  "Partner": {"No":0, "Yes":1},
+  "Dependents": {"No":0, "Yes":1},
+  "PhoneService": {"No":0, "Yes":1},
+  "MultipleLines": {"No":0, "Yes":1, "No phone service":2},
+  "InternetService": {"No":0, "Fiber Optic":1, "DSL":2},
+  "OnlineSecurity": {"No":0, "Yes":1, "No internet service":2},
+  "OnlineBackup": {"No":0, "Yes":1, "No internet service":2},
+  "DeviceProtection": {"No":0, "Yes":1, "No internet service":2},
+  "TechSupport": {"No":0, "Yes":1, "No internet service":2},
+  "StreamingTV": {"No":0, "Yes":1, "No internet service":2},
+  "StreamingMovies": {"No":0, "Yes":1, "No internet service":2},
+  "Contract": {"One year":0, "Two year":1, "Month-to-month":2},
+  "PaperlessBilling": {"No":0, "Yes":1},
+  "PaymentMethod": {
+    "Electronic check":0,
+    "Mailed check":1,
+    "Bank transfer (automatic)":2,
+    "Credit card (automatic)":3
+  },
+  "Churn": {"No":0, "Yes":1}
+}
