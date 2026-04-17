@@ -9,7 +9,7 @@ if __name__ == "__main__":
     data = pd.read_csv("data/WA_Fn-UseC_-Telco-Customer-Churn.csv", delimiter=",")
 
     """TODO
-    Do Preprocessing
+    Do Preprocessing, feature selection
     """
     data = data.drop(columns=["customerID"])
     data[["TotalCharges"]] = data[["TotalCharges"]].replace(" ", 0.0)
