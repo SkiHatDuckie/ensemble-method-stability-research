@@ -1,7 +1,6 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
 import pandas as pd
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
@@ -23,12 +22,21 @@ if __name__ == "__main__":
     """
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1:]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=15)
 
-    learner.model.fit(X_train, y_train)
-    y_pred = learner.model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print(f"Accuracy = {accuracy:.2f}")
+    training_scores = []
+    testing_scores = []
+    for seed in range(0, 100):
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=seed)
+
+        learner.model.fit(X_train, y_train)
+        training_scores.append(learner.model.score(X_train, y_train))
+        testing_scores.append(learner.model.score(X_test, y_test))
+        # print(f"Seed {seed}: Training Accuracy = {training_scores[-1]*100:2.1f}%")
+        # print(f"Seed {seed}: Testing Accuracy = {testing_scores[-1]*100:2.1f}%")
+    avg_training_score = sum(training_scores)/len(training_scores)
+    avg_testing_score = sum(testing_scores)/len(testing_scores)
+    print(f"AVG Training Accuracy: {avg_training_score*100:2.1f}%")
+    print(f"AVG Testing Accuracy: {avg_testing_score*100:2.1f}%")
 
     """TODO
     Add Evaluation Process
