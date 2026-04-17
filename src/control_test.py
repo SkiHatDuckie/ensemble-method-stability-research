@@ -17,9 +17,6 @@ if __name__ == "__main__":
     gradient_boosting = GradientBoosting()
     random_forest = RandomForest()
 
-    """TODO
-    Add Training Process
-    """
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1:]
 
