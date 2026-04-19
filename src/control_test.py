@@ -1,6 +1,5 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from ucimlrepo import fetch_ucirepo
 
