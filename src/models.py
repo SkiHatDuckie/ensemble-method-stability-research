@@ -1,5 +1,4 @@
 # src/models/base_learner.py
-# Model used as the base learner for all ensemble methods.
 from sklearn import tree
 from sklearn.ensemble import AdaBoostClassifier, \
     HistGradientBoostingClassifier, RandomForestClassifier

@@ -6,10 +6,11 @@ build-backend = "setuptools.build_meta"
 name = "ensemble-method-stability-research"
 version = "0.0.1"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "GPL-3.0-or-later"}
 
 dependencies = [
     "pandas==3.0.2",
     "scikit-learn==1.8.0",
+    "ucimlrepo==0.0.7",
 ]
