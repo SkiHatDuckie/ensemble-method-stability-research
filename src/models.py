@@ -6,7 +6,7 @@ from sklearn.ensemble import AdaBoostClassifier, \
 
 class BaseLearner:
     def __init__(self) -> None:
-        self.model = tree.DecisionTreeClassifier(max_depth=1)
+        self.model = tree.DecisionTreeClassifier(max_depth=2)
 
     def __str__(self) -> str:
         return "DecisionTreeClassifier"
@@ -14,7 +14,7 @@ class BaseLearner:
 
 class AdaBoost:
     def __init__(self, model) -> None:
-        self.model = AdaBoostClassifier(estimator=model, n_estimators=100)
+        self.model = AdaBoostClassifier(estimator=model, n_estimators=30)
     
     def __str__(self) -> str:
         return "AdaBoostClassifier"
@@ -22,7 +22,7 @@ class AdaBoost:
 
 class GradientBoosting:
     def __init__(self) -> None:
-        self.model = HistGradientBoostingClassifier()
+        self.model = HistGradientBoostingClassifier(learning_rate=0.2)
     
     def __str__(self) -> str:
         return "HistGradientBoostingClassifier"
@@ -30,7 +30,7 @@ class GradientBoosting:
 
 class RandomForest:
     def __init__(self) -> None:
-        self.model = RandomForestClassifier(n_estimators=100)
+        self.model = RandomForestClassifier(n_estimators=30)
     
     def __str__(self) -> str:
         return "RandomForestClassifier"
