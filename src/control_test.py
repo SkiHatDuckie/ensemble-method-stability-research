@@ -1,5 +1,7 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
+import os
+from pathlib import Path
 import time
 
 from sklearn.model_selection import train_test_split
@@ -7,9 +9,15 @@ from ucimlrepo import fetch_ucirepo
 
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
 
-def avg(l) -> float:
-    """Returns the mean from a list of numbers `l`."""
-    return sum(l) / len(l)
+def create_results_filepath(location, prefix="results") -> Path:
+    filename = f"{prefix}_{time.localtime()}.res"
+    filepath = location+filename
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    return filepath
+
+def avg(list_) -> float:
+    """Returns the mean from a list of numbers `list_`."""
+    return sum(list_) / len(list_)
 
 def train_test_loop(model, num_runs) -> tuple[list, list]:
     training_scores = []
@@ -24,20 +32,17 @@ def train_test_loop(model, num_runs) -> tuple[list, list]:
 
 if __name__ == "__main__":
     banknote_authentication = fetch_ucirepo(id=267)
-    # try:
-    #     data = pd.read_csv(data_path, delimiter=",")
-    # except FileNotFoundError:
-    #     print(f"ERROR: Cleaned dataset '{data_path}' not found. Did you run module clean_data?")
+    X = banknote_authentication.data.features
+    y = banknote_authentication.data.targets.values.ravel()
+
+    results_path = create_results_filepath("results/", prefix="control")
 
     learner = BaseLearner()
     adaboost = AdaBoost(learner.model)
     gradient_boosting = GradientBoosting()
     random_forest = RandomForest()
-
-    X = banknote_authentication.data.features
-    y = banknote_authentication.data.targets.values.ravel()
-
-    methods = (learner, adaboost, gradient_boosting, random_forest)
+    # methods = (learner, adaboost, gradient_boosting, random_forest)
+    methods = (learner,)
     runs = 100
     for method in methods:
         print(f"Method: {method}")
