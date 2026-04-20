@@ -15,20 +15,28 @@ def create_results_filepath(location, prefix="results") -> Path:
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
 
+def write_results(filepath, *metrics):
+    pass
+
 def avg(list_) -> float:
     """Returns the mean from a list of numbers `list_`."""
     return sum(list_) / len(list_)
 
-def train_test_loop(model, num_runs) -> tuple[list, list]:
+def train_test_loop(model, num_runs, results_path) -> None:
     training_scores = []
     testing_scores = []
+    training_times = []
     for seed in range(0, num_runs):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=seed)
+        time_start = time.perf_counter()
         model.fit(X_train, y_train)
+
+        training_times.append(time.perf_counter() - time_start)
         training_scores.append(model.score(X_train, y_train))
         testing_scores.append(model.score(X_test, y_test))
-    return training_scores, testing_scores
+    
+    write_results(results_path)
 
 if __name__ == "__main__":
     banknote_authentication = fetch_ucirepo(id=267)
@@ -45,13 +53,8 @@ if __name__ == "__main__":
     methods = (learner,)
     runs = 100
     for method in methods:
-        print(f"Method: {method}")
-        time_start = time.perf_counter()
-        training_scores, testing_scores = train_test_loop(method.model, runs)
-        print(f"runs: {runs}\t time: {time.perf_counter() - time_start:.3f} sec")
-        print(f"avg. training accuracy: {avg(training_scores)*100:.2f}%")
-        print(f"avg. testing accuracy: {avg(testing_scores)*100:.2f}%\n")
-
-    """TODO
-    Save Results to a File
-    """
+        print(f"Running method: {method}")
+        train_test_loop(method.model, runs, results_path)
+        # print(f"runs: {runs}\t time: {time.perf_counter() - time_start:.3f} sec")
+        # print(f"avg. training accuracy: {avg(training_scores)*100:.2f}%")
+        # print(f"avg. testing accuracy: {avg(testing_scores)*100:.2f}%\n")
