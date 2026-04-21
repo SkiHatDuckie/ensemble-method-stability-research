@@ -11,7 +11,7 @@ from metrics import Metric, MetricActions
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
 
 def create_results_filepath(location, prefix="results") -> Path:
-    filename = f"{prefix}_{time.strftime('%Y%m%d-%H%M%S')}.res"
+    filename = f"{prefix}_{time.strftime('%Y%m%d-%H%M%S')}.txt"
     filepath = location+filename
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
