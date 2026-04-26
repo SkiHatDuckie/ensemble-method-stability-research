@@ -11,9 +11,9 @@ import noise
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         "noise demo",
-        description="""Generates a diagram of the different noise algorithms applyed in
+        description="""Generates a diagram of the different noise algorithms applied in
 the experiment.""")
-    parser.add_argument("-frac", type=float, default=0.10)
+    parser.add_argument("-noise", type=float, default=0.1)
     return parser
 
 def plot_noisy_data(df, noisy_sample, ax):
