@@ -31,7 +31,8 @@ def create_results_filepath(location, prefix="results") -> Path:
 def set_output_stream(debug, noise) -> typing.TextIO:
     if debug:
         return sys.stdout
-    return open(create_results_filepath("results/", prefix="control"),
+    prefix = "control" if noise <= 0.0 else f"noise{int(noise * 100)}"
+    return open(create_results_filepath("results/", prefix=prefix),
                 "a",
                 encoding="utf-8")
 
