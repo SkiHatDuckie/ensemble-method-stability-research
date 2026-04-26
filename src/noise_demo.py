@@ -26,7 +26,7 @@ def plot_noisy_data(df, noisy_sample, ax):
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
-    frac = args.frac
+    frac = args.noise
 
     np.random.seed(5)
     df = pd.DataFrame(np.random.rand(100, 2), columns=["X", "Y"])
