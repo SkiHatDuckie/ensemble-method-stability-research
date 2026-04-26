@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.neighbors import KDTree
+from sklearn.svm import SVC
 
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -46,12 +47,24 @@ def neighborwise_sample(df, frac) -> pd.DataFrame:
     sample_indices = df_dists.head(int(df.shape[0] * frac)).index
     return df.loc[sample_indices]
 
+def nonlinearwise_sample(df, frac, seed) -> pd.DataFrame:
+    X = df.iloc[:, :-1].values
+    y = df[["class"]].values.ravel()
+    svm = SVC(kernel="rbf", random_state=seed)
+    svm.fit(X, y)
+    df_dists = pd.DataFrame(svm.decision_function(X), columns=["distance"]
+        ).abs().sort_values(by="distance")
+    sample_indices = df_dists.head(int(df.shape[0] * frac)).index
+    return df.loc[sample_indices]
+
 def get_sample(df, frac:float, sample_type, seed=0) -> pd.DataFrame:
     match sample_type:
         case "random":
             return df.sample(frac=frac, random_state=seed)
         case "neighborwise":
             return neighborwise_sample(df, frac)
+        case "nonlinearwise":
+            return nonlinearwise_sample(df, frac, seed)
 
 def plot_noisy_data(df, noisy_sample, ax):
     noisy_sample["class"] = 1 - noisy_sample["class"]
@@ -84,6 +97,10 @@ if __name__ == "__main__":
     axes[1, 0].set_title(f"Neighborwise label noise ({int(frac*100)}%)")
     label_noise_sample = get_sample(df, frac, "neighborwise")
     plot_noisy_data(df.copy(), label_noise_sample, axes[1, 0])
+
+    axes[1, 1].set_title(f"Non Linearwise label noise ({int(frac*100)}%)")
+    label_noise_sample = get_sample(df, frac, "nonlinearwise")
+    plot_noisy_data(df.copy(), label_noise_sample, axes[1, 1])
 
     for ax in axes.flat:
         ax.legend()
