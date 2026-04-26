@@ -7,11 +7,13 @@ import sys
 import time
 import typing
 
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from ucimlrepo import fetch_ucirepo
 
 from metrics import Metric, MetricActions
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
+from noise import get_sample
 
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -43,6 +45,12 @@ def write_results(stream, method, num_runs, *metrics_) -> None:
         stream.write(f"{metric}")
     stream.write("\n")
 
+def inject_label_noise(X, y, noise, sample_type) -> pd.Series:
+    noisy_sample = get_sample(pd.concat([X, y], axis=1), noise, sample_type)
+    noisy_sample["class"] = 1 - noisy_sample["class"]
+    y.loc[noisy_sample.index, :] = noisy_sample["class"]
+    return y
+
 def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
     training_scores = Metric(name="training accuracy",
                              actions=[MetricActions.PERCENT_AVERAGE],
@@ -58,8 +66,11 @@ def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
     for seed in range(0, num_runs):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                             random_state=seed)
+        if noise > 0.0:
+            y_train = inject_label_noise(X_train, y_train, noise, "random")
+
         time_start = time.perf_counter()
-        method.model.fit(X_train, y_train)
+        method.model.fit(X_train, y_train.values.ravel())
 
         training_times.data.append(time.perf_counter() - time_start)
         training_scores.data.append(method.model.score(X_train, y_train))
@@ -75,7 +86,7 @@ if __name__ == "__main__":
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
     X = X.drop("entropy", axis=1)
-    y = banknote_authentication.data.targets.values.ravel()
+    y = banknote_authentication.data.targets
 
     learner = BaseLearner()
     adaboost = AdaBoost(learner.model)
