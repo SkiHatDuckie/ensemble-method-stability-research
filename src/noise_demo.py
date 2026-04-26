@@ -53,6 +53,13 @@ def get_sample(df, frac:float, sample_type, seed=0) -> pd.DataFrame:
         case "neighborwise":
             return neighborwise_sample(df, frac)
 
+def plot_noisy_data(df, noisy_sample, ax):
+    noisy_sample["class"] = 1 - noisy_sample["class"]
+    df.loc[noisy_sample.index, :] = noisy_sample
+    sns.scatterplot(data=df, x="X", y="Y", hue="class", s=75, ax=ax)
+    sns.scatterplot(data=noisy_sample, x="X", y="Y", s=150, facecolors="none",
+                    edgecolor='r', linestyle='--', linewidth=1, ax=ax)
+
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
@@ -72,21 +79,11 @@ if __name__ == "__main__":
 
     axes[0, 1].set_title(f"Random label noise ({int(frac*100)}%)")
     label_noise_sample = get_sample(df, frac, "random")
-    label_noise_sample["class"] = 1 - label_noise_sample["class"]
-    df_noisy = df.copy()
-    df_noisy.loc[label_noise_sample.index, :] = label_noise_sample
-    sns.scatterplot(data=df_noisy, x="X", y="Y", hue="class", s=75, ax=axes[0, 1])
-    sns.scatterplot(data=label_noise_sample, x="X", y="Y", s=150, facecolors="none",
-                    edgecolor='r', linestyle='--', linewidth=1, ax=axes[0, 1])
+    plot_noisy_data(df.copy(), label_noise_sample, axes[0, 1])
 
     axes[1, 0].set_title(f"Neighborwise label noise ({int(frac*100)}%)")
     label_noise_sample = get_sample(df, frac, "neighborwise")
-    label_noise_sample["class"] = 1 - label_noise_sample["class"]
-    df_noisy = df.copy()
-    df_noisy.loc[label_noise_sample.index, :] = label_noise_sample
-    sns.scatterplot(data=df_noisy, x="X", y="Y", hue="class", s=75, ax=axes[1, 0])
-    sns.scatterplot(data=label_noise_sample, x="X", y="Y", s=150, facecolors="none",
-                    edgecolor='r', linestyle='--', linewidth=1, ax=axes[1, 0])
+    plot_noisy_data(df.copy(), label_noise_sample, axes[1, 0])
 
     for ax in axes.flat:
         ax.legend()
