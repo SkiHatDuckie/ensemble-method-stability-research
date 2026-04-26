@@ -1,5 +1,6 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
+import argparse
 import os
 from pathlib import Path
 import time
@@ -9,6 +10,14 @@ from ucimlrepo import fetch_ucirepo
 
 from metrics import Metric, MetricActions
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
+
+def create_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        "control_test",
+        description="""Run the main train-test loop. Records final results in directory
+`results/`""")
+    parser.add_argument("-noise", type=float, default=0.0)
+    return parser
 
 def create_results_filepath(location, prefix="results") -> Path:
     filename = f"{prefix}_{time.strftime('%Y%m%d-%H%M%S')}.txt"
@@ -49,6 +58,10 @@ def train_test_loop(method, num_runs, results_path) -> None:
     write_results(results_path, method, num_runs, *results_metrics)
 
 if __name__ == "__main__":
+    parser = create_parser()
+    args = parser.parse_args()
+    noise = args.noise
+
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
     y = banknote_authentication.data.targets.values.ravel()
