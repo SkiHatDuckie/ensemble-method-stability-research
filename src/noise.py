@@ -7,8 +7,8 @@ from sklearn.svm import SVC
 def interclass_nearest_neighbor(df) -> np.ndarray:
     """Returns a `numpy.ndarray` of euclidean distances of every point to the
     nearest neighbor from the *other* class."""
-    df0 = df[df["class"] == 0][["X", "Y"]]
-    df1 = df[df["class"] == 1][["X", "Y"]]
+    df0 = df[df["class"] == 0].drop("class", axis=1)
+    df1 = df[df["class"] == 1].drop("class", axis=1)
     tree0 = KDTree(df0.values, leaf_size=2, metric="euclidean")
     tree1 = KDTree(df1.values, leaf_size=2, metric="euclidean")
 

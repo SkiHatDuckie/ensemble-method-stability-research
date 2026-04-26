@@ -70,6 +70,8 @@ def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
                                                                 random_state=seed)
             if noise > 0.0:
+                X_train = X_train.reset_index(drop=True)
+                y_train = y_train.reset_index(drop=True)
                 y_train = inject_label_noise(X_train, y_train, noise, sample_type)
 
             time_start = time.perf_counter()
