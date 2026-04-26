@@ -43,7 +43,7 @@ def write_results(stream, method, num_runs, *metrics_) -> None:
         stream.write(f"{metric}")
     stream.write("\n")
 
-def train_test_loop(method, num_runs, out_stream, noise=0.0) -> None:
+def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
     training_scores = Metric(name="training accuracy",
                              actions=[MetricActions.PERCENT_AVERAGE],
                              decimal_precision=2)
@@ -85,4 +85,4 @@ if __name__ == "__main__":
     runs = 100
     for method in methods:
         print(f"Running method: {method}")
-        train_test_loop(method, runs, out_stream, args.noise)
+        train_test_loop(X, y, method, runs, out_stream, args.noise)
