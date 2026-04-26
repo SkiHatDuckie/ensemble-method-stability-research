@@ -28,14 +28,14 @@ def create_results_filepath(location, prefix="results") -> Path:
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
 
-def set_output_stream(debug) -> typing.TextIO:
+def set_output_stream(debug, noise) -> typing.TextIO:
     if debug:
         return sys.stdout
     return open(create_results_filepath("results/", prefix="control"),
                 "a",
                 encoding="utf-8")
 
-def write_results(stream, method, num_runs, *metrics_):
+def write_results(stream, method, num_runs, *metrics_) -> None:
     stream.write(f"Method: {method}\n")
     stream.write(f"runs: {num_runs}\n")
     for metric in metrics_:
@@ -69,10 +69,11 @@ def train_test_loop(method, num_runs, out_stream, noise=0.0) -> None:
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
-    out_stream = set_output_stream(args.debug)
+    out_stream = set_output_stream(args.debug, args.noise)
 
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
+    X = X.drop("entropy", axis=1)
     y = banknote_authentication.data.targets.values.ravel()
 
     learner = BaseLearner()
