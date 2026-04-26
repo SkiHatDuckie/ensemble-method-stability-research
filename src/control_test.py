@@ -8,12 +8,20 @@ import time
 import typing
 
 import pandas as pd
+from sklearn.metrics import f1_score, roc_auc_score
 from sklearn.model_selection import train_test_split
 from ucimlrepo import fetch_ucirepo
 
 from metrics import Metric, MetricActions
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
 from noise import get_sample
+
+def get_probability_scores(model, X_test):
+    if hasattr(model, "predict_proba"):
+        return model.predict_proba(X_test)[:, 1]
+    if hasattr(model, "decision_function"):
+        return model.decision_function(X_test)
+    return model.predict(X_test)
 
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -29,6 +37,13 @@ def create_results_filepath(location, prefix="results") -> Path:
     filepath = location+filename
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
+
+def create_csv_results_filepath(location, prefix="control_raw") -> Path:
+    filename = f"{prefix}_{time.strftime('%Y%m%d-%H%M%S')}.csv"
+    filepath = location+filename
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    return filepath
+
 
 def set_output_stream(debug, noise) -> typing.TextIO:
     if debug:
@@ -50,17 +65,23 @@ def inject_label_noise(X, y, noise, sample_type) -> pd.Series:
     y.loc[noisy_sample.index, :] = noisy_sample["class"]
     return y
 
-def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
+def train_test_loop(X, y, method, num_runs, out_stream, noise, raw_records) -> None:
     training_scores = Metric(name="training accuracy",
                              actions=[MetricActions.PERCENT_AVERAGE],
                              decimal_precision=2)
     testing_scores = Metric(name="testing accuracy",
                             actions=[MetricActions.PERCENT_AVERAGE],
                             decimal_precision=2)
+    testing_f1_scores = Metric(name="testing F1 score",
+                               actions=[MetricActions.AVERAGE],
+                               decimal_precision=3)
+    testing_roc_auc = Metric(name="testing ROC-AUC",
+                             actions=[MetricActions.AVERAGE],
+                             decimal_precision=3)
     training_times = Metric(name="training time",
                             actions=[MetricActions.AVERAGE, MetricActions.TOTAL],
                             suffix="sec")
-    results_metrics = [training_scores, testing_scores, training_times]
+    results_metrics = [training_scores, testing_scores, testing_f1_scores, testing_roc_auc, training_times]
 
     sample_types = ["control (none)"]
     if noise > 0.0:
@@ -76,10 +97,31 @@ def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
 
             time_start = time.perf_counter()
             method.model.fit(X_train, y_train.values.ravel())
+            training_time = time.perf_counter() - time_start
 
-            training_times.data.append(time.perf_counter() - time_start)
-            training_scores.data.append(method.model.score(X_train, y_train))
-            testing_scores.data.append(method.model.score(X_test, y_test))
+            y_pred = method.model.predict(X_test)
+            y_score = get_probability_scores(method.model, X_test)
+            training_accuracy = method.model.score(X_train, y_train)
+            testing_accuracy = method.model.score(X_test, y_test)
+            f1 = f1_score(y_test, y_pred, zero_division=0)
+            roc_auc = roc_auc_score(y_test, y_score)
+
+            training_times.data.append(training_time)
+            training_scores.data.append(training_accuracy)
+            testing_scores.data.append(testing_accuracy)
+            testing_f1_scores.data.append(f1)
+            testing_roc_auc.data.append(roc_auc)
+
+            raw_records.append({
+                "method": str(method),
+                "sample_type": sample_type,
+                "seed": seed,
+                "training_accuracy": training_accuracy,
+                "testing_accuracy": testing_accuracy,
+                "training_time": training_time,
+                "f1_score": f1,
+                "roc_auc": roc_auc,
+            })
 
         write_results(out_stream, sample_type, *results_metrics)
 
@@ -102,8 +144,14 @@ if __name__ == "__main__":
     random_forest = RandomForest()
     methods = (learner, adaboost, gradient_boosting, random_forest)
     runs = 100
+
+    raw_records = []
     for method in methods:
         print(f"Running method: {method}")
         out_stream.write(f"Method: {method}\n")
         out_stream.write(f"Runs per sample type: {runs}\n")
-        train_test_loop(X, y, method, runs, out_stream, args.noise)
+        train_test_loop(X, y, method, runs, out_stream, args.noise, raw_records)
+
+    raw_results_path = create_csv_results_filepath("results/", prefix="control_raw")
+    pd.DataFrame(raw_records).to_csv(raw_results_path, index=False)
+    print(f"Saved raw control results to {raw_results_path}")

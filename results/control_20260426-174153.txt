@@ -1,0 +1,42 @@
+=== Testing with 0% noise ===
+
+Method: DecisionTreeClassifier
+Runs per sample type: 100
+Sample type: control (none)
+avg. training accuracy: 91.54%
+avg. testing accuracy: 90.56%
+avg. testing F1 score: 0.891 
+avg. testing ROC-AUC: 0.923 
+avg. training time: 0.001 sec
+tot. training time: 0.149 sec
+
+Method: AdaBoostClassifier
+Runs per sample type: 100
+Sample type: control (none)
+avg. training accuracy: 100.00%
+avg. testing accuracy: 99.48%
+avg. testing F1 score: 0.994 
+avg. testing ROC-AUC: 1.000 
+avg. training time: 0.042 sec
+tot. training time: 4.150 sec
+
+Method: HistGradientBoostingClassifier
+Runs per sample type: 100
+Sample type: control (none)
+avg. training accuracy: 100.00%
+avg. testing accuracy: 99.33%
+avg. testing F1 score: 0.993 
+avg. testing ROC-AUC: 1.000 
+avg. training time: 0.253 sec
+tot. training time: 25.329 sec
+
+Method: RandomForestClassifier
+Runs per sample type: 100
+Sample type: control (none)
+avg. training accuracy: 100.00%
+avg. testing accuracy: 99.08%
+avg. testing F1 score: 0.990 
+avg. testing ROC-AUC: 1.000 
+avg. training time: 0.032 sec
+tot. training time: 3.212 sec
+
