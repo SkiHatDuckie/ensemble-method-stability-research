@@ -64,7 +64,7 @@ def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
 
     sample_types = ["control (none)"]
     if noise > 0.0:
-        sample_types = ["random"]
+        sample_types = ["random", "neighborwise", "nonlinearwise"]
     for sample_type in sample_types:
         for seed in range(0, num_runs):
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
