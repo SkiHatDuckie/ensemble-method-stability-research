@@ -38,9 +38,8 @@ def set_output_stream(debug, noise) -> typing.TextIO:
                 "a",
                 encoding="utf-8")
 
-def write_results(stream, method, num_runs, *metrics_) -> None:
-    stream.write(f"Method: {method}\n")
-    stream.write(f"runs: {num_runs}\n")
+def write_results(stream, sample_type, *metrics_) -> None:
+    stream.write(f"Sample type: {sample_type}\n")
     for metric in metrics_:
         stream.write(f"{metric}")
     stream.write("\n")
@@ -63,25 +62,32 @@ def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
                             suffix="sec")
     results_metrics = [training_scores, testing_scores, training_times]
 
-    for seed in range(0, num_runs):
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
-                                                            random_state=seed)
-        if noise > 0.0:
-            y_train = inject_label_noise(X_train, y_train, noise, "random")
+    sample_types = ["control (none)"]
+    if noise > 0.0:
+        sample_types = ["random"]
+    for sample_type in sample_types:
+        for seed in range(0, num_runs):
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+                                                                random_state=seed)
+            if noise > 0.0:
+                y_train = inject_label_noise(X_train, y_train, noise, sample_type)
 
-        time_start = time.perf_counter()
-        method.model.fit(X_train, y_train.values.ravel())
+            time_start = time.perf_counter()
+            method.model.fit(X_train, y_train.values.ravel())
 
-        training_times.data.append(time.perf_counter() - time_start)
-        training_scores.data.append(method.model.score(X_train, y_train))
-        testing_scores.data.append(method.model.score(X_test, y_test))
+            training_times.data.append(time.perf_counter() - time_start)
+            training_scores.data.append(method.model.score(X_train, y_train))
+            testing_scores.data.append(method.model.score(X_test, y_test))
 
-    write_results(out_stream, method, num_runs, *results_metrics)
+        write_results(out_stream, sample_type, *results_metrics)
 
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
     out_stream = set_output_stream(args.debug, args.noise)
+    results_header = f"=== Testing with {int(args.noise * 100)}% noise ===\n"
+    print(results_header)
+    out_stream.write(results_header + "\n")
 
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
@@ -96,4 +102,6 @@ if __name__ == "__main__":
     runs = 100
     for method in methods:
         print(f"Running method: {method}")
+        out_stream.write(f"Method: {method}\n")
+        out_stream.write(f"Runs per sample type: {runs}\n")
         train_test_loop(X, y, method, runs, out_stream, args.noise)
