@@ -3,7 +3,9 @@
 import argparse
 import os
 from pathlib import Path
+import sys
 import time
+import typing
 
 from sklearn.model_selection import train_test_split
 from ucimlrepo import fetch_ucirepo
@@ -17,6 +19,7 @@ def create_parser() -> argparse.ArgumentParser:
         description="""Run the main train-test loop. Records final results in directory
 `results/`""")
     parser.add_argument("-noise", type=float, default=0.0)
+    parser.add_argument("-debug", action="store_true")
     return parser
 
 def create_results_filepath(location, prefix="results") -> Path:
@@ -25,15 +28,21 @@ def create_results_filepath(location, prefix="results") -> Path:
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
 
-def write_results(filepath, method, num_runs, *metrics_):
-    with open(filepath, "a", encoding="utf-8") as f:
-        f.write(f"Method: {method}\n")
-        f.write(f"runs: {num_runs}\n")
-        for metric in metrics_:
-            f.write(f"{metric}")
-        f.write("\n")
+def set_output_stream(debug) -> typing.TextIO:
+    if debug:
+        return sys.stdout
+    return open(create_results_filepath("results/", prefix="control"),
+                "a",
+                encoding="utf-8")
 
-def train_test_loop(method, num_runs, results_path) -> None:
+def write_results(stream, method, num_runs, *metrics_):
+    stream.write(f"Method: {method}\n")
+    stream.write(f"runs: {num_runs}\n")
+    for metric in metrics_:
+        stream.write(f"{metric}")
+    stream.write("\n")
+
+def train_test_loop(method, num_runs, out_stream, noise=0.0) -> None:
     training_scores = Metric(name="training accuracy",
                              actions=[MetricActions.PERCENT_AVERAGE],
                              decimal_precision=2)
@@ -55,17 +64,16 @@ def train_test_loop(method, num_runs, results_path) -> None:
         training_scores.data.append(method.model.score(X_train, y_train))
         testing_scores.data.append(method.model.score(X_test, y_test))
 
-    write_results(results_path, method, num_runs, *results_metrics)
+    write_results(out_stream, method, num_runs, *results_metrics)
 
 if __name__ == "__main__":
     parser = create_parser()
     args = parser.parse_args()
-    noise = args.noise
+    out_stream = set_output_stream(args.debug)
 
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
     y = banknote_authentication.data.targets.values.ravel()
-    results_path = create_results_filepath("results/", prefix="control")
 
     learner = BaseLearner()
     adaboost = AdaBoost(learner.model)
@@ -75,4 +83,4 @@ if __name__ == "__main__":
     runs = 100
     for method in methods:
         print(f"Running method: {method}")
-        train_test_loop(method, runs, results_path)
+        train_test_loop(method, runs, out_stream, args.noise)
