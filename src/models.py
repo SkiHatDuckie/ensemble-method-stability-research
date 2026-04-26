@@ -30,7 +30,7 @@ class GradientBoosting:
 
 class RandomForest:
     def __init__(self) -> None:
-        self.model = RandomForestClassifier(n_estimators=30)
+        self.model = RandomForestClassifier(n_estimators=30, random_state=0)
     
     def __str__(self) -> str:
         return "RandomForestClassifier"

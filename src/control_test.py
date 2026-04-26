@@ -1,14 +1,28 @@
 # src/control_test.py
 # Used for training/evaluating models on unaltered data
+import argparse
 import os
 from pathlib import Path
+import sys
 import time
+import typing
 
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from ucimlrepo import fetch_ucirepo
 
 from metrics import Metric, MetricActions
 from models import BaseLearner, AdaBoost, GradientBoosting, RandomForest
+from noise import get_sample
+
+def create_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        "control_test",
+        description="""Run the main train-test loop. Records final results in directory
+`results/`""")
+    parser.add_argument("-noise", type=float, default=0.0)
+    parser.add_argument("-debug", action="store_true")
+    return parser
 
 def create_results_filepath(location, prefix="results") -> Path:
     filename = f"{prefix}_{time.strftime('%Y%m%d-%H%M%S')}.txt"
@@ -16,15 +30,27 @@ def create_results_filepath(location, prefix="results") -> Path:
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
 
-def write_results(filepath, method, num_runs, *metrics_):
-    with open(filepath, "a", encoding="utf-8") as f:
-        f.write(f"Method: {method}\n")
-        f.write(f"runs: {num_runs}\n")
-        for metric in metrics_:
-            f.write(f"{metric}")
-        f.write("\n")
+def set_output_stream(debug, noise) -> typing.TextIO:
+    if debug:
+        return sys.stdout
+    prefix = "control" if noise <= 0.0 else f"noise{int(noise * 100)}"
+    return open(create_results_filepath("results/", prefix=prefix),
+                "a",
+                encoding="utf-8")
 
-def train_test_loop(method, num_runs, results_path) -> None:
+def write_results(stream, sample_type, *metrics_) -> None:
+    stream.write(f"Sample type: {sample_type}\n")
+    for metric in metrics_:
+        stream.write(f"{metric}")
+    stream.write("\n")
+
+def inject_label_noise(X, y, noise, sample_type) -> pd.Series:
+    noisy_sample = get_sample(pd.concat([X, y], axis=1), noise, sample_type)
+    noisy_sample["class"] = 1 - noisy_sample["class"]
+    y.loc[noisy_sample.index, :] = noisy_sample["class"]
+    return y
+
+def train_test_loop(X, y, method, num_runs, out_stream, noise) -> None:
     training_scores = Metric(name="training accuracy",
                              actions=[MetricActions.PERCENT_AVERAGE],
                              decimal_precision=2)
@@ -36,23 +62,37 @@ def train_test_loop(method, num_runs, results_path) -> None:
                             suffix="sec")
     results_metrics = [training_scores, testing_scores, training_times]
 
-    for seed in range(0, num_runs):
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
-                                                            random_state=seed)
-        time_start = time.perf_counter()
-        method.model.fit(X_train, y_train)
+    sample_types = ["control (none)"]
+    if noise > 0.0:
+        sample_types = ["random", "neighborwise", "nonlinearwise"]
+    for sample_type in sample_types:
+        for seed in range(0, num_runs):
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+                                                                random_state=seed)
+            if noise > 0.0:
+                y_train = inject_label_noise(X_train, y_train, noise, sample_type)
 
-        training_times.data.append(time.perf_counter() - time_start)
-        training_scores.data.append(method.model.score(X_train, y_train))
-        testing_scores.data.append(method.model.score(X_test, y_test))
+            time_start = time.perf_counter()
+            method.model.fit(X_train, y_train.values.ravel())
 
-    write_results(results_path, method, num_runs, *results_metrics)
+            training_times.data.append(time.perf_counter() - time_start)
+            training_scores.data.append(method.model.score(X_train, y_train))
+            testing_scores.data.append(method.model.score(X_test, y_test))
+
+        write_results(out_stream, sample_type, *results_metrics)
 
 if __name__ == "__main__":
+    parser = create_parser()
+    args = parser.parse_args()
+    out_stream = set_output_stream(args.debug, args.noise)
+    results_header = f"=== Testing with {int(args.noise * 100)}% noise ===\n"
+    print(results_header)
+    out_stream.write(results_header + "\n")
+
     banknote_authentication = fetch_ucirepo(id=267)
     X = banknote_authentication.data.features
-    y = banknote_authentication.data.targets.values.ravel()
-    results_path = create_results_filepath("results/", prefix="control")
+    X = X.drop("entropy", axis=1)
+    y = banknote_authentication.data.targets
 
     learner = BaseLearner()
     adaboost = AdaBoost(learner.model)
@@ -62,4 +102,6 @@ if __name__ == "__main__":
     runs = 100
     for method in methods:
         print(f"Running method: {method}")
-        train_test_loop(method, runs, results_path)
+        out_stream.write(f"Method: {method}\n")
+        out_stream.write(f"Runs per sample type: {runs}\n")
+        train_test_loop(X, y, method, runs, out_stream, args.noise)

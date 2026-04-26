@@ -9,6 +9,7 @@ From the project directory:
 | arguments | type | default | description |
 | :--- | :--- | :--- | :--- |
 | `-noise` | float (0.0 -- 1.0) | 0.0 | Percentage of noise to inject as a fraction. Noise injection is skipped if set to 0 |
+| `-debug` | flag | False | Print results to stdout instead of a file. Purely for debugging |
 
 ### noise_demo
 Generates a diagram of the different noise algorithms applied in the experiment.
