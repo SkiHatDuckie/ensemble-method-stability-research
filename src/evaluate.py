@@ -75,6 +75,7 @@ def prepare_results_df(results_df: pd.DataFrame) -> pd.DataFrame:
     df = results_df.copy()
     df["sample_type_label"] = df["sample_type"].apply(normalize_sample_type)
     df["is_baseline_sample_type"] = df["sample_type_label"] == BASELINE_SAMPLE_TYPE
+    df["accuracy_gap"] = df["training_accuracy"] - df["testing_accuracy"]
     return df
 
 
@@ -190,6 +191,7 @@ def plot_file_charts(results_df: pd.DataFrame, output_dir: Path) -> None:
         ("testing_accuracy", "Testing Accuracy"),
         ("f1_score", "F1 Score"),
         ("roc_auc", "ROC-AUC"),
+        ("accuracy_gap", "Training - Testing Accuracy"),
     ]
     grouped_by_noise = (
         results_df
@@ -250,6 +252,7 @@ def plot_combined_charts(results_df: pd.DataFrame, output_dir: Path) -> None:
         ("testing_accuracy", "Testing Accuracy"),
         ("f1_score", "F1 Score"),
         ("roc_auc", "ROC-AUC"),
+        ("accuracy_gap", "Training - Testing Accuracy"),
     ]
 
     for column, title in metrics:
@@ -273,7 +276,7 @@ def plot_combined_charts(results_df: pd.DataFrame, output_dir: Path) -> None:
         fig.savefig(output_dir / f"combined_{column}.png", dpi=200)
         plt.close(fig)
 
-    fig, axes = plt.subplots(1, 3, figsize=(20, 6), sharex=True)
+    fig, axes = plt.subplots(1, 4, figsize=(24, 6), sharex=True)
     for ax, (column, title) in zip(axes, metrics):
         sns.lineplot(
             data=combined,
@@ -320,6 +323,39 @@ def plot_combined_charts(results_df: pd.DataFrame, output_dir: Path) -> None:
             plt.tight_layout()
             fig.savefig(output_dir / f"combined_{column}_{safe_sample_type}.png", dpi=200)
             plt.close(fig)
+
+
+def plot_accuracy_gap_per_run(results_df: pd.DataFrame, output_dir: Path) -> None:
+    gap_df = results_df.dropna(subset=["accuracy_gap"]).copy()
+    if gap_df.empty:
+        return
+
+    gap_df["run_label"] = (
+        gap_df["experiment"].astype(str)
+        + " / "
+        + gap_df["method"].astype(str)
+        + " / "
+        + gap_df["sample_type_label"].astype(str)
+    )
+
+    fig, ax = plt.subplots(figsize=(18, 8))
+    sns.barplot(
+        data=gap_df,
+        x="run_label",
+        y="accuracy_gap",
+        hue="sample_type_label",
+        ax=ax,
+        palette="tab10",
+        errorbar=None,
+    )
+    ax.set_title("Training vs Testing Accuracy Gap per Run")
+    ax.set_ylabel("Training Accuracy - Testing Accuracy (%)")
+    ax.set_xlabel("Experiment / Method / Sample type")
+    ax.tick_params(axis="x", rotation=90)
+    ax.legend(title="Sample type", bbox_to_anchor=(1.02, 1), loc="upper left")
+    plt.tight_layout()
+    fig.savefig(output_dir / "accuracy_gap_per_run.png", dpi=200)
+    plt.close(fig)
 
 
 def plot_metric_model_by_sample_type(results_df: pd.DataFrame, output_dir: Path) -> None:
@@ -401,6 +437,7 @@ def main() -> None:
 
     plot_file_charts(results_df, output_dir)
     plot_combined_charts(results_df, output_dir)
+    plot_accuracy_gap_per_run(results_df, output_dir)
     plot_metric_model_by_sample_type(results_df, output_dir)
 
     print(f"Loaded {len(paths)} result file(s)")
