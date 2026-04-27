@@ -139,7 +139,7 @@ if __name__ == "__main__":
     y = banknote_authentication.data.targets
 
     learner = BaseLearner()
-    decision_tree = BaseLearner(depth=None)
+    decision_tree = BaseLearner(depth=5)
     adaboost = AdaBoost(learner.model)
     gradient_boosting = GradientBoosting()
     random_forest = RandomForest()
