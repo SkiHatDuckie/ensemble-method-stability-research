@@ -1,0 +1,106 @@
+=== Testing with 10% noise ===
+
+Method: DecisionTreeClassifier
+Runs per sample type: 100
+Sample type: random
+avg. training accuracy: 83.17%
+avg. testing accuracy: 89.61%
+avg. testing F1 score: 0.880 
+avg. testing ROC-AUC: 0.919 
+avg. training time: 0.001 sec
+tot. training time: 0.133 sec
+
+Sample type: neighborwise
+avg. training accuracy: 84.81%
+avg. testing accuracy: 89.63%
+avg. testing F1 score: 0.879 
+avg. testing ROC-AUC: 0.912 
+avg. training time: 0.001 sec
+tot. training time: 0.279 sec
+
+Sample type: nonlinearwise
+avg. training accuracy: 85.50%
+avg. testing accuracy: 89.53%
+avg. testing F1 score: 0.878 
+avg. testing ROC-AUC: 0.917 
+avg. training time: 0.001 sec
+tot. training time: 0.421 sec
+
+Method: AdaBoostClassifier
+Runs per sample type: 100
+Sample type: random
+avg. training accuracy: 88.74%
+avg. testing accuracy: 96.90%
+avg. testing F1 score: 0.965 
+avg. testing ROC-AUC: 0.996 
+avg. training time: 0.041 sec
+tot. training time: 4.114 sec
+
+Sample type: neighborwise
+avg. training accuracy: 90.64%
+avg. testing accuracy: 96.62%
+avg. testing F1 score: 0.962 
+avg. testing ROC-AUC: 0.994 
+avg. training time: 0.041 sec
+tot. training time: 8.214 sec
+
+Sample type: nonlinearwise
+avg. training accuracy: 91.74%
+avg. testing accuracy: 96.55%
+avg. testing F1 score: 0.961 
+avg. testing ROC-AUC: 0.994 
+avg. training time: 0.041 sec
+tot. training time: 12.304 sec
+
+Method: HistGradientBoostingClassifier
+Runs per sample type: 100
+Sample type: random
+avg. training accuracy: 99.58%
+avg. testing accuracy: 94.91%
+avg. testing F1 score: 0.943 
+avg. testing ROC-AUC: 0.991 
+avg. training time: 0.298 sec
+tot. training time: 29.793 sec
+
+Sample type: neighborwise
+avg. training accuracy: 99.79%
+avg. testing accuracy: 92.70%
+avg. testing F1 score: 0.916 
+avg. testing ROC-AUC: 0.981 
+avg. training time: 0.281 sec
+tot. training time: 56.289 sec
+
+Sample type: nonlinearwise
+avg. training accuracy: 99.77%
+avg. testing accuracy: 92.49%
+avg. testing F1 score: 0.914 
+avg. testing ROC-AUC: 0.980 
+avg. training time: 0.249 sec
+tot. training time: 74.652 sec
+
+Method: RandomForestClassifier
+Runs per sample type: 100
+Sample type: random
+avg. training accuracy: 99.48%
+avg. testing accuracy: 97.52%
+avg. testing F1 score: 0.972 
+avg. testing ROC-AUC: 0.997 
+avg. training time: 0.036 sec
+tot. training time: 3.606 sec
+
+Sample type: neighborwise
+avg. training accuracy: 99.69%
+avg. testing accuracy: 95.41%
+avg. testing F1 score: 0.947 
+avg. testing ROC-AUC: 0.988 
+avg. training time: 0.035 sec
+tot. training time: 6.989 sec
+
+Sample type: nonlinearwise
+avg. training accuracy: 99.76%
+avg. testing accuracy: 94.73%
+avg. testing F1 score: 0.940 
+avg. testing ROC-AUC: 0.983 
+avg. training time: 0.034 sec
+tot. training time: 10.329 sec
+

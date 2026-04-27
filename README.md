@@ -16,3 +16,6 @@ Generates a diagram of the different noise algorithms applied in the experiment.
 | arguments | type | default | description |
 | :--- | :--- | :--- | :--- |
 | `-noise` | float (0.0 -- 1.0) | 0.1 | Percentage of noise to inject as a fraction |
+
+### data_analysis
+Various graphs generated during initial data analysis.
