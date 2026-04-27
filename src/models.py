@@ -5,8 +5,8 @@ from sklearn.ensemble import AdaBoostClassifier, \
 
 
 class BaseLearner:
-    def __init__(self) -> None:
-        self.model = tree.DecisionTreeClassifier(max_depth=2)
+    def __init__(self, depth=2) -> None:
+        self.model = tree.DecisionTreeClassifier(max_depth=depth)
 
     def __str__(self) -> str:
         return "DecisionTreeClassifier"
