@@ -1,6 +1,15 @@
 # ensemble-method-stability-research
 This project is also hosted on GitHub: [https://github.com/SkiHatDuckie/ensemble-method-stability-research]()
 
+This project tests the resilience of three different ensemble methods and one
+decision tree when noise is increasingly added to a training set. Tests are
+done by running `run_tests` with no arguments to get the initial performace on
+the clean training set. Then the script is ran again with the `-noise` argument
+set to some fraction (ex. `-noise=0.05` -> 5% noise) to test the models
+with added label noise, using 3 different methods on sampling. Each combination
+of model and sampling method is put through 100 trials on seeds 0->99 to ensure
+results aren't based on picking a (un)favorable random seed.
+
 Due to the format of the experiments and how evaluation was done, it did not make
 sense for us to merge everything into a single point of execution. Instead, details
 for each executable script and its purpose are described in the following section.
