@@ -1,5 +1,5 @@
 # src/control_test.py
-# Used for training/evaluating models on unaltered data
+# Used for training models and recording performance to a file.
 import argparse
 import os
 from pathlib import Path
@@ -43,7 +43,6 @@ def create_csv_results_filepath(location, prefix="control_raw") -> Path:
     filepath = location+filename
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
-
 
 def set_output_stream(debug, noise) -> typing.TextIO:
     if debug:

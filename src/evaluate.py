@@ -325,39 +325,6 @@ def plot_combined_charts(results_df: pd.DataFrame, output_dir: Path) -> None:
             plt.close(fig)
 
 
-# def plot_accuracy_gap_per_run(results_df: pd.DataFrame, output_dir: Path) -> None:
-#     gap_df = results_df.dropna(subset=["accuracy_gap"]).copy()
-#     if gap_df.empty:
-#         return
-
-#     gap_df["run_label"] = (
-#         gap_df["experiment"].astype(str)
-#         + " / "
-#         + gap_df["method"].astype(str)
-#         + " / "
-#         + gap_df["sample_type_label"].astype(str)
-#     )
-
-#     fig, ax = plt.subplots(figsize=(18, 8))
-#     sns.barplot(
-#         data=gap_df,
-#         x="run_label",
-#         y="accuracy_gap",
-#         hue="sample_type_label",
-#         ax=ax,
-#         palette="tab10",
-#         errorbar=None,
-#     )
-#     ax.set_title("Training vs Testing Accuracy Gap per Run")
-#     ax.set_ylabel("Training Accuracy - Testing Accuracy (%)")
-#     ax.set_xlabel("Experiment / Method / Sample type")
-#     ax.tick_params(axis="x", rotation=90)
-#     ax.legend(title="Sample type", bbox_to_anchor=(1.02, 1), loc="upper left")
-#     plt.tight_layout()
-#     fig.savefig(output_dir / "accuracy_gap_per_run.png", dpi=200)
-#     plt.close(fig)
-
-
 def plot_metric_model_by_sample_type(results_df: pd.DataFrame, output_dir: Path) -> None:
     combined = results_df.dropna(subset=["noise_percent"]).copy()
     combined["noise_percent"] = combined["noise_percent"].astype(float)
@@ -437,7 +404,6 @@ def main() -> None:
 
     plot_file_charts(results_df, output_dir)
     plot_combined_charts(results_df, output_dir)
-    # plot_accuracy_gap_per_run(results_df, output_dir)
     plot_metric_model_by_sample_type(results_df, output_dir)
 
     print(f"Loaded {len(paths)} result file(s)")
