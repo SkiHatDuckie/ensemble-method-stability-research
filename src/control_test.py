@@ -44,7 +44,6 @@ def create_csv_results_filepath(location, prefix="control_raw") -> Path:
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     return filepath
 
-
 def set_output_stream(debug, noise) -> typing.TextIO:
     if debug:
         return sys.stdout
