@@ -1,4 +1,12 @@
 # ensemble-method-stability-research
+This project is also hosted on GitHub: [https://github.com/SkiHatDuckie/ensemble-method-stability-research]()
+
+Due to the format of the experiments and how evaluation was done, it did not make
+sense for us to merge everything into a single point of execution. Instead, details
+for each executable script and its purpose are described in the following section.
+
+`pyproject.toml` is used to handle required dependencies. These dependencies include
+`matplotlib`, `pandas`, `scikit-learn`, `seaborn` and `ucimlrepo`.
 
 ## To Use
 From the project directory:
