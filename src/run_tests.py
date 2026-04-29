@@ -1,5 +1,5 @@
 # src/control_test.py
-# Used for training/evaluating models on unaltered data
+# Used for training models and recording performance to a file.
 import argparse
 import os
 from pathlib import Path
